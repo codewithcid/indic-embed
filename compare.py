@@ -20,7 +20,7 @@ PARAMS_M = {
     "jinaai/jina-embeddings-v3": 572,
     # ours (run_mteb.py --like registers local models as local/<dir>)
     "local/e5-small-indic-48k": 40.5, "local/e5-small-indic-64k": 46.8, "local/indic-e5-small-phaseA": 46.8,
-    "local/indic-e5-small-phaseA2": 46.8,
+    "local/indic-e5-small-phaseA2": 46.8, "local/indic-e5-small-phaseA3": 46.8,
 }
 
 

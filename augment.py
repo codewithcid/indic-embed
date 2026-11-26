@@ -54,3 +54,13 @@ def casual(text: str, rng: random.Random, lang: str = "") -> str:
     if rng.random() < 0.35:  # kk -> k, pp -> p, ...
         t = re.sub(r"([bcdfgjklmnprstvBCDFGJKLMNPRSTV])\1", r"\1", t)
     return t
+
+
+def aligned_crop(native: str, roman: str, rng: random.Random, lo: int = 2, hi: int = 8) -> tuple[str, str] | None:
+    """The same 2-8 word window of a word-aligned native/romanized pair: short, query-like text."""
+    n, r = native.split(), roman.split()
+    if len(n) != len(r) or len(n) < lo:
+        return None
+    k = rng.randint(lo, min(hi, len(n)))
+    s = rng.randint(0, len(n) - k)
+    return " ".join(n[s:s + k]), " ".join(r[s:s + k])

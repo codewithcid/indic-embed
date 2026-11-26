@@ -5,3 +5,4 @@ results/mteb/
 results/vocab/
 *.log
 models/
+.venv-onnx/
