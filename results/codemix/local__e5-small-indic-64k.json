@@ -1,0 +1,125 @@
+{
+ "model": "local/e5-small-indic-64k",
+ "dakshina": {
+  "bn": {
+   "n": 2000,
+   "roman_to_native": {
+    "recall@1": 0.478,
+    "mrr@10": 0.5310958333333333
+   },
+   "native_to_roman": {
+    "recall@1": 0.522,
+    "mrr@10": 0.5827029761904762
+   }
+  },
+  "gu": {
+   "n": 2000,
+   "roman_to_native": {
+    "recall@1": 0.312,
+    "mrr@10": 0.36747420634920636
+   },
+   "native_to_roman": {
+    "recall@1": 0.418,
+    "mrr@10": 0.47613333333333335
+   }
+  },
+  "hi": {
+   "n": 2000,
+   "roman_to_native": {
+    "recall@1": 0.437,
+    "mrr@10": 0.4809240079365079
+   },
+   "native_to_roman": {
+    "recall@1": 0.5815,
+    "mrr@10": 0.6316448412698412
+   }
+  },
+  "kn": {
+   "n": 2000,
+   "roman_to_native": {
+    "recall@1": 0.36,
+    "mrr@10": 0.4057345238095238
+   },
+   "native_to_roman": {
+    "recall@1": 0.458,
+    "mrr@10": 0.5079688492063492
+   }
+  },
+  "ml": {
+   "n": 2000,
+   "roman_to_native": {
+    "recall@1": 0.3605,
+    "mrr@10": 0.4107146825396825
+   },
+   "native_to_roman": {
+    "recall@1": 0.49,
+    "mrr@10": 0.544753373015873
+   }
+  },
+  "mr": {
+   "n": 2000,
+   "roman_to_native": {
+    "recall@1": 0.453,
+    "mrr@10": 0.5073904761904762
+   },
+   "native_to_roman": {
+    "recall@1": 0.556,
+    "mrr@10": 0.6108363095238095
+   }
+  },
+  "pa": {
+   "n": 2000,
+   "roman_to_native": {
+    "recall@1": 0.4295,
+    "mrr@10": 0.48310138888888887
+   },
+   "native_to_roman": {
+    "recall@1": 0.527,
+    "mrr@10": 0.5871341269841269
+   }
+  },
+  "ta": {
+   "n": 2000,
+   "roman_to_native": {
+    "recall@1": 0.2785,
+    "mrr@10": 0.31841011904761907
+   },
+   "native_to_roman": {
+    "recall@1": 0.373,
+    "mrr@10": 0.42483710317460316
+   }
+  },
+  "te": {
+   "n": 2000,
+   "roman_to_native": {
+    "recall@1": 0.3785,
+    "mrr@10": 0.4316436507936508
+   },
+   "native_to_roman": {
+    "recall@1": 0.5045,
+    "mrr@10": 0.5608424603174603
+   }
+  },
+  "ur": {
+   "n": 2000,
+   "roman_to_native": {
+    "recall@1": 0.4705,
+    "mrr@10": 0.5210047619047619
+   },
+   "native_to_roman": {
+    "recall@1": 0.5395,
+    "mrr@10": 0.5943051587301588
+   }
+  }
+ },
+ "tanglish_sts": {
+  "n": 325,
+  "spearman": 0.7290300709238857
+ },
+ "summary": {
+  "dakshina_roman_to_native_r1": 0.39575,
+  "dakshina_native_to_roman_r1": 0.4969500000000001,
+  "tanglish_sts_spearman": 0.7290300709238857,
+  "seconds": 165.98505449295044
+ }
+}

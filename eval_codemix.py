@@ -66,6 +66,7 @@ def retrieval_scores(q: np.ndarray, d: np.ndarray) -> dict:
 def main() -> None:
     p = argparse.ArgumentParser()
     p.add_argument("model")
+    p.add_argument("--like", help="for a local model: the Hub model whose prompts to use")
     p.add_argument("--max-per-lang", type=int, default=2000)
     p.add_argument("--batch-size", type=int, default=64)
     p.add_argument("--out", default="results/codemix")
@@ -75,9 +76,9 @@ def main() -> None:
     model = SentenceTransformer(args.model, device=device, trust_remote_code=False)
     if device == "cuda":
         model.half()
-    qp, dp = PROMPTS.get(args.model, ("", ""))
+    qp, dp = PROMPTS.get(args.like or args.model, ("", ""))
     t0 = time.time()
-    out = {"model": args.model, "dakshina": {}, "tanglish_sts": None}
+    out = {"model": f"local/{Path(args.model).name}" if args.like else args.model, "dakshina": {}, "tanglish_sts": None}
 
     for lang in LANGS:
         pairs = load_dakshina(lang, args.max_per_lang)
@@ -109,7 +110,7 @@ def main() -> None:
     print(f"{args.model}: dakshina R@1 roman->native {r2n:.3f}, native->roman {n2r:.3f}; "
           f"tanglish-sts {out['tanglish_sts']['spearman']:.3f}")
     Path(args.out).mkdir(parents=True, exist_ok=True)
-    (Path(args.out) / f"{args.model.replace('/', '__')}.json").write_text(json.dumps(out, indent=1), encoding="utf-8")
+    (Path(args.out) / f"{('local__' + Path(args.model).name) if args.like else args.model.replace('/', '__')}.json").write_text(json.dumps(out, indent=1), encoding="utf-8")
 
 
 if __name__ == "__main__":
