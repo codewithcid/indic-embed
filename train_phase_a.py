@@ -3,7 +3,9 @@
 Multilingual knowledge distillation (Reimers & Gurevych, 2020) with the original multilingual-e5-small as the
 frozen teacher. For each aligned pair (native, romanized) the student is trained so that
     S(native) ~ T(native),  S(romanized) ~ T(native),  S(casual romanized) ~ T(native)
-and S(english) ~ T(english) keeps English where it was. Loss: 1 - cosine. Both e5 prefixes are used.
+and, with --mix (data/train/lexicon.json from build_lexicon.py), S(code-mixed casual romanized) ~ T(native),
+where some words are swapped for English as in Hinglish/Tanglish. S(english) ~ T(english) keeps English where it
+was. Loss: 1 - cosine. Both e5 prefixes are used.
 
     python train_phase_a.py --precompute       # teacher embeddings, once
     python train_phase_a.py --epochs 1 --batch-size 64
@@ -23,6 +25,8 @@ import torch
 import torch.nn.functional as F
 from sentence_transformers import SentenceTransformer
 
+from augment import casual, code_mix
+
 DATA = Path("data/train")
 TEACHER = "intfloat/multilingual-e5-small"
 STUDENT = "models/e5-small-indic-64k"
@@ -31,17 +35,6 @@ PREFIXES = ["query: ", "passage: "]
 
 def read_jsonl(path: Path) -> list[dict]:
     return [json.loads(line) for line in path.read_text(encoding="utf-8").splitlines() if line.strip()]
-
-
-def casual(text: str, rng: random.Random) -> str:
-    """Spelling variation people use when typing romanized Indic text."""
-    t = text.lower() if rng.random() < 0.5 else text
-    rules = [("aa", "a"), ("ee", "i"), ("oo", "u"), ("ii", "i"), ("uu", "u"), ("bh", "b"), ("dh", "d"), ("th", "t"),
-             ("kh", "k"), ("gh", "g"), ("jh", "j"), ("ph", "f"), ("ack ", "ek "), ("haye", "hai"), ("v", "w")]
-    for a, b in rules:
-        if rng.random() < 0.35:
-            t = t.replace(a, b)
-    return t
 
 
 @torch.no_grad()
@@ -93,6 +86,7 @@ def train(args) -> None:
     n_train = len(pairs)
     t_dev = t_nat[1][n_train:]  # dev rows follow the train rows; "passage: " prefix, as in evaluate()
 
+    lexicon = json.loads((DATA / "lexicon.json").read_text(encoding="utf-8")) if args.mix else None
     model = SentenceTransformer(STUDENT, device="cuda")
     model.max_seq_length = args.max_len
     model.train()
@@ -116,14 +110,20 @@ def train(args) -> None:
             target = torch.tensor(t_nat[p][idx], device="cuda", dtype=torch.float32)
             nat = [prefix + pairs[i]["native"] for i in idx]
             rom = [prefix + pairs[i]["roman"] for i in idx]
-            cas = [prefix + casual(pairs[i]["roman"], rng) for i in idx]
+            cas = [prefix + casual(pairs[i]["roman"], rng, pairs[i]["lang"]) for i in idx]
+            views = [(nat, target), (rom, target), (cas, target)]
+            if lexicon:
+                mix = [code_mix(pairs[i]["native"], pairs[i]["roman"], lexicon[pairs[i]["lang"]], rng, args.mix_p)
+                       for i in idx]
+                views.append(([prefix + (casual(m, rng, pairs[i]["lang"]) if rng.random() < 0.5 else m)
+                               for m, i in zip(mix, idx)], target))
             e_idx = rng.sample(range(len(english)), args.batch_size // 4)
             eng = [prefix + english[i] for i in e_idx]
             e_target = torch.tensor(t_eng[p][e_idx], device="cuda", dtype=torch.float32)
-            # the loss is a per-example sum, so one backward per group gives the same gradient with ~1/4 the memory
+            # the loss is a per-example sum, so one backward per view gives the same gradient with less memory
             opt.zero_grad(set_to_none=True)
             loss = 0.0
-            for x, t in ((nat, target), (rom, target), (cas, target), (eng, e_target)):
+            for x, t in views + [(eng, e_target)]:
                 with torch.autocast("cuda", dtype=torch.float16):
                     part = (1 - (embed(model, x).float() * t).sum(1)).mean()
                 scaler.scale(part).backward()
@@ -160,6 +160,8 @@ def main() -> None:
     p.add_argument("--log-every", type=int, default=50)
     p.add_argument("--max-steps", type=int, default=0, help="stop early (for a quick test)")
     p.add_argument("--min-native-cos", type=float, default=0.97, help="do not save if native embeddings drift more")
+    p.add_argument("--mix", action="store_true", help="add the code-mixed view (needs data/train/lexicon.json)")
+    p.add_argument("--mix-p", type=float, default=0.6, help="probability of swapping a lexicon word for English")
     p.add_argument("--out", default="models/indic-e5-small-phaseA")
     args = p.parse_args()
     precompute() if args.precompute else train(args)
