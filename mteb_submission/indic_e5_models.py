@@ -54,7 +54,7 @@ indic_e5_small = ModelMeta(
     similarity_fn_name=ScoringFunction.COSINE,
     framework=["Sentence Transformers", "PyTorch", "ONNX", "safetensors"],
     use_instructions=True,
-    public_training_code=None,
+    public_training_code="https://github.com/codewithcid/indic-embed",
     public_training_data="https://huggingface.co/datasets/ai4bharat/sangraha",
     # vocabulary-trimmed multilingual-e5-small, distilled on Sangraha (not an MTEB dataset)
     training_datasets=ME5_TRAINING_DATA,
