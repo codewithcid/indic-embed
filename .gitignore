@@ -6,3 +6,4 @@ results/vocab/
 *.log
 models/
 .venv-onnx/
+demo/node-check/node_modules/

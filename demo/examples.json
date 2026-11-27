@@ -1,0 +1,32 @@
+{"docs": [
+ ["hi", "मुझे कल ऑफिस जाना है"], ["hi", "आज बहुत बारिश हो रही है"], ["hi", "ट्रेन दो घंटे लेट है"],
+ ["ta", "நான் நாளைக்கு வருவேன்"], ["ta", "இந்த படம் ரொம்ப நல்லா இருக்கு"], ["ta", "எனக்கு பசிக்குது"],
+ ["ml", "എനിക്ക് നാളെ ലീവ് വേണം"], ["ml", "ഈ ഹോട്ടലിലെ ഭക്ഷണം നല്ലതാണ്"],
+ ["bn", "আমি তোমাকে ভালোবাসি"], ["bn", "ঢাকা বাংলাদেশের রাজধানী"],
+ ["te", "నాకు తెలుగు సినిమాలు ఇష్టం"], ["te", "రేపు పరీక్ష ఉంది"],
+ ["mr", "मला पुण्याला जायचं आहे"], ["kn", "ಬೆಂಗಳೂರಿನಲ್ಲಿ ಟ್ರಾಫಿಕ್ ತುಂಬಾ ಇದೆ"], ["gu", "મને ચા પીવી છે"],
+ ["pa", "ਮੈਂ ਪੰਜਾਬ ਤੋਂ ਹਾਂ"], ["ur", "مجھے کرکٹ دیکھنا پسند ہے"],
+ ["en", "Where is the nearest hospital?"], ["en", "I need a day off tomorrow"], ["en", "The food here is delicious"]
+],
+"queries": [
+ ["mujhe kal office jana hai", "मुझे कल ऑफिस जाना है"],
+ ["aaj bahut barish ho rahi hai", "आज बहुत बारिश हो रही है"],
+ ["train 2 ghante late hai", "ट्रेन दो घंटे लेट है"],
+ ["naan naalaikku varuven", "நான் நாளைக்கு வருவேன்"],
+ ["intha padam romba nalla irukku", "இந்த படம் ரொம்ப நல்லா இருக்கு"],
+ ["enakku pasikkudhu", "எனக்கு பசிக்குது"],
+ ["enikku naale leave venam", "എനിക്ക് നാളെ ലീവ് വേണം"],
+ ["ee hotelile food nallathanu", "ഈ ഹോട്ടലിലെ ഭക്ഷണം നല്ലതാണ്"],
+ ["ami tomake bhalobashi", "আমি তোমাকে ভালোবাসি"],
+ ["dhaka bangladesher rajdhani", "ঢাকা বাংলাদেশের রাজধানী"],
+ ["naaku telugu cinemalu ishtam", "నాకు తెలుగు సినిమాలు ఇష్టం"],
+ ["repu exam undi", "రేపు పరీక్ష ఉంది"],
+ ["mala punyala jaycha aahe", "मला पुण्याला जायचं आहे"],
+ ["bengalurinalli traffic tumba ide", "ಬೆಂಗಳೂರಿನಲ್ಲಿ ಟ್ರಾಫಿಕ್ ತುಂಬಾ ಇದೆ"],
+ ["mane cha pivi che", "મને ચા પીવી છે"],
+ ["main punjab ton haan", "ਮੈਂ ਪੰਜਾਬ ਤੋਂ ਹਾਂ"],
+ ["mujhe cricket dekhna pasand hai", "مجھے کرکٹ دیکھنا پسند ہے"],
+ ["sabse paas hospital kahan hai", "Where is the nearest hospital?"],
+ ["kal mujhe chutti chahiye", "I need a day off tomorrow"],
+ ["yahan ka khana bahut tasty hai", "The food here is delicious"]
+]}
