@@ -3,11 +3,34 @@ from mteb.models.model_meta import ModelMeta, ScoringFunction
 from mteb.models.sentence_transformer_wrapper import SentenceTransformerEncoderWrapper
 
 INDIC_E5_LANGUAGES = [
-    "hin-Deva", "ben-Beng", "tam-Taml", "tel-Telu", "mal-Mlym", "mar-Deva", "guj-Gujr", "kan-Knda", "pan-Guru",
-    "ory-Orya", "asm-Beng", "urd-Arab", "npi-Deva", "eng-Latn",
+    "hin-Deva",
+    "ben-Beng",
+    "tam-Taml",
+    "tel-Telu",
+    "mal-Mlym",
+    "mar-Deva",
+    "guj-Gujr",
+    "kan-Knda",
+    "pan-Guru",
+    "ory-Orya",
+    "asm-Beng",
+    "urd-Arab",
+    "npi-Deva",
+    "eng-Latn",
     # romanized (Latin-script) Indic text
-    "hin-Latn", "ben-Latn", "tam-Latn", "tel-Latn", "mal-Latn", "mar-Latn", "guj-Latn", "kan-Latn", "pan-Latn",
-    "ory-Latn", "asm-Latn", "urd-Latn", "npi-Latn",
+    "hin-Latn",
+    "ben-Latn",
+    "tam-Latn",
+    "tel-Latn",
+    "mal-Latn",
+    "mar-Latn",
+    "guj-Latn",
+    "kan-Latn",
+    "pan-Latn",
+    "ory-Latn",
+    "asm-Latn",
+    "urd-Latn",
+    "npi-Latn",
 ]
 
 indic_e5_small = ModelMeta(

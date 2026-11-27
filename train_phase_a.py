@@ -167,7 +167,9 @@ def train(args) -> None:
                 print(f"eval step {step}: {m}", flush=True)
                 if select_score(m) > best and m["native_cos_to_teacher"] >= args.min_native_cos:
                     best = select_score(m)
+                    model.max_seq_length = 512  # save with e5's limit, not the training length
                     model.save(str(out_dir))
+                    model.max_seq_length = args.max_len
                     (out_dir / "train_state.json").write_text(json.dumps({"step": step, **m, **vars(args)}, indent=1))
                     print(f"  saved (best selection score {best:.3f})", flush=True)
             if args.max_steps and step >= args.max_steps:

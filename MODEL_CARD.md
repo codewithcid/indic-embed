@@ -18,13 +18,13 @@ casually spelled and code-mixed text lands where the original model puts the nat
 
 | model | params | MTEB(Indic) | Dakshina roman→native R@1 | native→roman R@1 | TanglishSTS |
 |---|---|---|---|---|---|
-| **indic-e5-small** | **47M** | 0.648 | **0.827** | **0.905** | 0.699 |
+| **indic-e5-small** | **47M** | **0.651** | **0.827** | **0.905** | 0.699 |
 | multilingual-e5-small | 118M | 0.648 | 0.396 | 0.498 | 0.729 |
 | L3Cube indic-sentence-similarity-sbert | 238M | 0.592 | 0.772 | 0.819 | 0.692 |
 | bge-m3 | 568M | 0.686 | 0.534 | 0.586 | 0.758 |
 | LaBSE | 471M | 0.617 | 0.478 | 0.436 | 0.750 |
 
-MTEB(Indic, v1): mean over its 20 tasks. Dakshina: 2,000 human-romanized sentences per language, 10 languages,
+MTEB(Indic, v1): mean over its 20 tasks (retrieval 0.780 vs 0.768 for multilingual-e5-small). Dakshina: 2,000 human-romanized sentences per language, 10 languages,
 retrieval of the native sentence among 2,000. TanglishSTS: Spearman on 325 Tamil–English code-mixed pairs.
 Neither Dakshina nor TanglishSTS was used for training or for choosing checkpoints. TanglishSTS is small: the
 difference to multilingual-e5-small is -0.032, 95% paired-bootstrap CI [-0.081, +0.017], i.e. not significant.
