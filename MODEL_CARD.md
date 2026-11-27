@@ -59,6 +59,11 @@ const out = await embed(["query: mujhe kal office jana hai", "passage: मुझ
 
 ## How it was made
 
+Code: [github.com/codewithcid/indic-embed](https://github.com/codewithcid/indic-embed). MTEB leaderboard submission:
+[embeddings-benchmark/mteb#6014](https://github.com/embeddings-benchmark/mteb/pull/6014),
+[embeddings-benchmark/results#877](https://github.com/embeddings-benchmark/results/pull/877).
+
+
 1. **Vocabulary trimming.** Token frequencies from Wikipedia and Sangraha in 13 languages plus romanized text,
    balanced per language; the 64K most useful pieces (and every single character of the target scripts) are kept
    and the embedding rows gathered. MTEB(Indic) 0.6471 vs 0.6484 for the full model.
