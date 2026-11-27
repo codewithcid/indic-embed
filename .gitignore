@@ -9,3 +9,4 @@ models/
 demo/node-check/node_modules/
 mteb_submission/cache/
 *.done
+mteb_submission/mteb_pr_*.md
