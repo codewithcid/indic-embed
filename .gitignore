@@ -7,3 +7,5 @@ results/vocab/
 models/
 .venv-onnx/
 demo/node-check/node_modules/
+mteb_submission/cache/
+*.done

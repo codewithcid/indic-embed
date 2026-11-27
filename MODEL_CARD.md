@@ -8,8 +8,6 @@ tags: [sentence-transformers, embeddings, indic, romanized, transliteration, cod
 datasets: [ai4bharat/sangraha]
 ---
 
-<!-- DRAFT: numbers are for models/indic-e5-small-phaseA2; set {{repo}} before publishing -->
-
 # indic-e5-small
 
 A 47M-parameter sentence-embedding model for 13 Indian languages and English that understands Indic text **in its
@@ -20,7 +18,7 @@ casually spelled and code-mixed text lands where the original model puts the nat
 
 | model | params | MTEB(Indic) | Dakshina roman→native R@1 | native→roman R@1 | TanglishSTS |
 |---|---|---|---|---|---|
-| **indic-e5-small** | **47M** | 0.648 | **0.776** | **0.879** | 0.703 |
+| **indic-e5-small** | **47M** | 0.648 | **0.827** | **0.905** | 0.699 |
 | multilingual-e5-small | 118M | 0.648 | 0.396 | 0.498 | 0.729 |
 | L3Cube indic-sentence-similarity-sbert | 238M | 0.592 | 0.772 | 0.819 | 0.692 |
 | bge-m3 | 568M | 0.686 | 0.534 | 0.586 | 0.758 |
@@ -29,21 +27,34 @@ casually spelled and code-mixed text lands where the original model puts the nat
 MTEB(Indic, v1): mean over its 20 tasks. Dakshina: 2,000 human-romanized sentences per language, 10 languages,
 retrieval of the native sentence among 2,000. TanglishSTS: Spearman on 325 Tamil–English code-mixed pairs.
 Neither Dakshina nor TanglishSTS was used for training or for choosing checkpoints. TanglishSTS is small: the
-difference to multilingual-e5-small is -0.027, 95% paired-bootstrap CI [-0.076, +0.020], i.e. not significant.
-English is unchanged (STSB 0.838 vs 0.841).
+difference to multilingual-e5-small is -0.032, 95% paired-bootstrap CI [-0.081, +0.017], i.e. not significant.
+English is unchanged (STSB 0.837 vs 0.841, SICK-R 0.773 vs 0.775).
 
 ## Usage
 
 Same prefixes as e5: `query: ` for queries and symmetric tasks, `passage: ` for documents.
+`encode_query` / `encode_document` add them for you (sentence-transformers 5+); with older versions, or with
+plain `encode`, add them yourself.
 
 ```python
 from sentence_transformers import SentenceTransformer
 
-model = SentenceTransformer("{{repo}}")
-q = model.encode(["query: mujhe kal office jaana hai"], normalize_embeddings=True)
-d = model.encode(["passage: मुझे कल ऑफिस जाना है", "passage: I have to go to the office tomorrow"],
-                 normalize_embeddings=True)
-print(q @ d.T)
+model = SentenceTransformer("cidcodes/indic-e5-small")
+q = model.encode_query(["mujhe kal office jana hai"])
+d = model.encode_document(["मुझे कल ऑफिस जाना है", "আজ খুব বৃষ্টি হচ্ছে", "I have to go to the office tomorrow"])
+print(model.similarity(q, d))
+```
+
+In the browser or Node with [transformers.js](https://github.com/huggingface/transformers.js) (`onnx/model_quantized.onnx`,
+47 MB, per-channel int8; cosine ≥ 0.99 to the full model). Try it in the
+[demo Space](https://huggingface.co/spaces/cidcodes/indic-e5-small-demo).
+
+```js
+import { pipeline } from "@huggingface/transformers";
+
+const embed = await pipeline("feature-extraction", "cidcodes/indic-e5-small", { dtype: "q8" });
+const out = await embed(["query: mujhe kal office jana hai", "passage: मुझे कल ऑफिस जाना है"],
+                        { pooling: "mean", normalize: true });
 ```
 
 ## How it was made
@@ -55,14 +66,17 @@ print(q @ d.T)
    multilingual-e5-small, frozen. On 256K aligned native/romanized paragraphs from Sangraha's synthetic split, the
    student is trained so that S(native), S(romanized), S(casually spelled romanized) and S(code-mixed romanized)
    all match T(native), and S(English) matches T(English). Code-mixing swaps words for English using a lexicon
-   induced from the teacher's own embeddings (margin-based mutual nearest neighbours). One epoch on a 4 GB laptop
-   GPU (RTX 3050), about an hour.
+   induced from the teacher's own embeddings (margin-based mutual nearest neighbours). Short, query-like inputs
+   come from the same 2-8 word window of each word-aligned pair, with the teacher run on the fly. One epoch on a
+   4 GB laptop GPU (RTX 3050), about 75 minutes.
 
 ## Limitations
 
 - Romanization in the training data is synthetic; very informal spellings and heavy code-mixing are only
   approximated by rules and an induced lexicon.
-- Tamil is the weakest language for romanized input (Dakshina R@1 0.586).
+- Tamil is the weakest language for romanized input (Dakshina R@1 0.668; Hindi 0.921).
+- Training text is Wikipedia-style written language. Very colloquial spoken forms (e.g. spoken Tamil
+  "enakku pasikkudhu" for written "enakku pasikkiradhu") and short chat messages are weaker.
 - Max sequence length 512 as in e5-small, but training used 128 tokens.
 
 ## Data and licenses

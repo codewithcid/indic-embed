@@ -1,0 +1,161 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>indic-e5-small demo</title>
+<style>
+  :root {
+    --bg: #fbfaf7; --panel: #ffffff; --ink: #1d1b16; --muted: #6b665c; --line: #e6e1d6;
+    --accent: #c2410c; --accent-soft: #fde7d9; --bar: #f2b48c;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root { --bg: #14130f; --panel: #1d1b16; --ink: #f1ede4; --muted: #a39d90; --line: #333028;
+            --accent: #fb923c; --accent-soft: #3a2415; --bar: #9a4a1c; }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--ink);
+         font: 16px/1.5 system-ui, -apple-system, "Segoe UI", "Noto Sans", sans-serif; }
+  main { max-width: 760px; margin: 0 auto; padding: 32px 16px 64px; }
+  h1 { font-size: 1.6rem; margin: 0 0 4px; letter-spacing: -0.01em; }
+  .sub { color: var(--muted); margin: 0 0 24px; }
+  .search { display: flex; gap: 8px; }
+  input[type=text] { flex: 1; min-width: 0; padding: 12px 14px; font: inherit; color: var(--ink);
+         background: var(--panel); border: 1px solid var(--line); border-radius: 10px; }
+  input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: -1px; }
+  .chips { display: flex; flex-wrap: wrap; gap: 6px; margin: 12px 0 20px; }
+  .chip { border: 1px solid var(--line); background: var(--panel); color: var(--ink); border-radius: 999px;
+          padding: 4px 10px; font: inherit; font-size: 0.85rem; cursor: pointer; }
+  .chip:hover { border-color: var(--accent); }
+  #status { color: var(--muted); font-size: 0.9rem; min-height: 1.5em; margin-bottom: 8px; }
+  ol { list-style: none; padding: 0; margin: 0; }
+  li { display: grid; grid-template-columns: 2.6rem 1fr 4.5rem; align-items: center; gap: 10px;
+       padding: 10px 12px; border: 1px solid var(--line); border-radius: 10px; margin-bottom: 6px;
+       background: var(--panel); }
+  li.top { border-color: var(--accent); background: var(--accent-soft); }
+  .lang { font-size: 0.75rem; font-weight: 600; color: var(--muted); text-transform: uppercase; }
+  .text { font-size: 1.05rem; overflow-wrap: anywhere; }
+  .score { font-variant-numeric: tabular-nums; font-size: 0.85rem; color: var(--muted); text-align: right; }
+  .bar { height: 3px; background: var(--bar); border-radius: 2px; margin-top: 4px; }
+  details { margin-top: 28px; }
+  summary { cursor: pointer; color: var(--muted); }
+  textarea { width: 100%; min-height: 220px; margin-top: 8px; padding: 10px; font: inherit; font-size: 0.95rem;
+             color: var(--ink); background: var(--panel); border: 1px solid var(--line); border-radius: 10px; }
+  footer { margin-top: 32px; color: var(--muted); font-size: 0.85rem; }
+  footer a { color: var(--accent); }
+</style>
+</head>
+<body>
+<main>
+  <h1>indic-e5-small</h1>
+  <p class="sub">Search Indian-language text by typing the way people text: romanized, loosely spelled, mixed with
+    English. A 47M-parameter embedding model running entirely in your browser.</p>
+
+  <div class="search">
+    <input id="q" type="text" placeholder="Try: mujhe kal office jana hai" autocomplete="off" spellcheck="false">
+  </div>
+  <div class="chips" id="chips"></div>
+  <div id="status">Loading the model (47 MB, cached after the first visit)…</div>
+  <ol id="results"></ol>
+
+  <details>
+    <summary>Edit the documents (one per line)</summary>
+    <textarea id="docs" spellcheck="false"></textarea>
+  </details>
+
+  <footer>
+    Model: <a id="model-link" href="#">indic-e5-small</a> · vocabulary-trimmed and distilled from
+    multilingual-e5-small · runs with <a href="https://github.com/huggingface/transformers.js">transformers.js</a>.
+    Nothing you type leaves your browser.
+  </footer>
+</main>
+
+<script type="module">
+  import { env, pipeline } from "https://cdn.jsdelivr.net/npm/@huggingface/transformers@3.8.1";
+
+  const MODEL_ID = "cidcodes/indic-e5-small";  // Hugging Face repo id of the released model
+  const local = ["localhost", "127.0.0.1"].includes(location.hostname);
+  if (local) {  // python -m http.server from the repo root, then open /demo/
+    env.localModelPath = "/models/release/";
+    env.allowRemoteModels = false;
+  }
+  const modelName = local ? "indic-e5-small" : MODEL_ID;
+  document.getElementById("model-link").href = `https://huggingface.co/${MODEL_ID}`;
+
+  const DOCS = [
+    "मुझे कल ऑफिस जाना है", "आज बहुत बारिश हो रही है", "ट्रेन दो घंटे लेट है",
+    "நான் நாளைக்கு வருவேன்", "இந்த படம் ரொம்ப நல்லா இருக்கு", "எனக்கு பசிக்குது",
+    "എനിക്ക് നാളെ ലീവ് വേണം", "ഈ ഹോട്ടലിലെ ഭക്ഷണം നല്ലതാണ്",
+    "আমি তোমাকে ভালোবাসি", "ঢাকা বাংলাদেশের রাজধানী",
+    "నాకు తెలుగు సినిమాలు ఇష్టం", "రేపు పరీక్ష ఉంది",
+    "मला पुण्याला जायचं आहे", "ಬೆಂಗಳೂರಿನಲ್ಲಿ ಟ್ರಾಫಿಕ್ ತುಂಬಾ ಇದೆ", "મને ચા પીવી છે",
+    "ਮੈਂ ਪੰਜਾਬ ਤੋਂ ਹਾਂ", "مجھے کرکٹ دیکھنا پسند ہے",
+    "Where is the nearest hospital?", "I need a day off tomorrow", "The food here is delicious",
+  ];
+  const EXAMPLES = ["mujhe kal office jana hai", "aaj bahut barish ho rahi hai", "naan naalaikku varuven",
+    "enikku naale leave venam", "naaku telugu cinemalu ishtam", "bengalurinalli traffic tumba ide",
+    "sabse paas hospital kahan hai", "yahan ka khana bahut tasty hai"];
+
+  // Unicode block -> language label (Devanagari is shared, so it is labelled by script)
+  const SCRIPTS = [[/[\u0900-\u097F]/, "deva"], [/[\u0980-\u09FF]/, "bn"], [/[\u0A00-\u0A7F]/, "pa"],
+    [/[\u0A80-\u0AFF]/, "gu"], [/[\u0B00-\u0B7F]/, "or"], [/[\u0B80-\u0BFF]/, "ta"], [/[\u0C00-\u0C7F]/, "te"],
+    [/[\u0C80-\u0CFF]/, "kn"], [/[\u0D00-\u0D7F]/, "ml"], [/[\u0600-\u06FF]/, "ur"]];
+  const langOf = (t) => (SCRIPTS.find(([re]) => re.test(t)) || [null, "en"])[1];
+
+  const $ = (id) => document.getElementById(id);
+  const docsBox = $("docs"), q = $("q"), status = $("status"), results = $("results");
+  docsBox.value = DOCS.join("\n");
+  for (const ex of EXAMPLES) {
+    const b = Object.assign(document.createElement("button"), { className: "chip", textContent: ex });
+    b.onclick = () => { q.value = ex; search(); };
+    $("chips").append(b);
+  }
+
+  let embed, docs = [], docVecs = [];
+  const dot = (a, b) => a.reduce((s, x, i) => s + x * b[i], 0);
+  const encode = async (texts) => (await embed(texts, { pooling: "mean", normalize: true })).tolist();
+
+  async function indexDocs() {
+    docs = docsBox.value.split("\n").map((s) => s.trim()).filter(Boolean);
+    docVecs = docs.length ? await encode(docs.map((d) => "passage: " + d)) : [];
+  }
+
+  async function search() {
+    if (!embed) return;
+    const text = q.value.trim();
+    if (!text) { results.replaceChildren(); return; }
+    const t0 = performance.now();
+    const [v] = await encode(["query: " + text]);
+    const ranked = docs.map((d, i) => [d, dot(v, docVecs[i])]).sort((a, b) => b[1] - a[1]).slice(0, 8);
+    const lo = ranked.at(-1)[1], hi = ranked[0][1];
+    results.replaceChildren(...ranked.map(([d, s], i) => {
+      const li = document.createElement("li");
+      if (i === 0) li.className = "top";
+      const lang = Object.assign(document.createElement("span"), { className: "lang", textContent: langOf(d) });
+      const body = document.createElement("div");
+      body.append(Object.assign(document.createElement("div"), { className: "text", textContent: d }));
+      const bar = Object.assign(document.createElement("div"), { className: "bar" });
+      bar.style.width = `${Math.max(4, ((s - lo) / Math.max(1e-6, hi - lo)) * 100)}%`;
+      body.append(bar);
+      const score = Object.assign(document.createElement("span"), { className: "score", textContent: s.toFixed(3) });
+      li.append(lang, body, score);
+      return li;
+    }));
+    status.textContent = `${docs.length} documents · query embedded in ${Math.round(performance.now() - t0)} ms`;
+  }
+
+  let timer;
+  q.addEventListener("input", () => { clearTimeout(timer); timer = setTimeout(search, 200); });
+  docsBox.addEventListener("change", async () => { await indexDocs(); search(); });
+
+  try {
+    embed = await pipeline("feature-extraction", modelName, { dtype: "q8" });
+    await indexDocs();
+    status.textContent = "Ready. Type in any Indian language, in its script or in English letters.";
+    q.focus();
+  } catch (e) {
+    status.textContent = "Could not load the model: " + e.message;
+  }
+</script>
+</body>
+</html>
